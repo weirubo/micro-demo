@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+// protoc --proto_path=. --micro_out=. --go_out=. user.proto
+// protoc-go-inject-tag -input=./user.pb.go
+// protoc --proto_path=. --micro_out=. --go_out=. user.proto && protoc-go-inject-tag -XXX_skip=xorm,redis -input=./user.pb.go
+
+package user;
+
+service UserService {
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+  rpc Register(User) returns (RegisterResponse) {}
+  rpc UserInfo(User) returns (UserInfoResponse) {}
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string username = 1;
+}
+
+message User {
+  // @inject_tag: xorm:"'id' not null pk autoincr" redis:"id"
+  int64 id = 1;
+  // @inject_tag: xorm:"'user_name' varchar(30) not null default ''" redis:"username"
+  string username = 2;
+  // @inject_tag: xorm:"'email' varchar(30) not null default ''" redis:"email"
+  string email = 3;
+  // @inject_tag: xorm:"'password' varchar(30) not null default ''" redis:"password"
+  string password = 4;
+  // @inject_tag: xorm:"'created_at' created"
+  int64 created = 5;
+  // @inject_tag: xorm:"'updated_at' updated"
+  int64 updated = 6;
+  // @inject_tag: xorm:"'deleted_at' deleted"
+  int64 deleted = 7;
+}
+
+message RegisterResponse {
+  int64 code = 1;
+  string message = 2;
+  int64 affected = 3;
+}
+
+message UserInfoResponse {
+  int64 code = 1;
+  string message = 2;
+  User data = 3;
+}
+
